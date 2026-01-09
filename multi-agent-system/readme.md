@@ -69,6 +69,7 @@ To keep this accessible and free, we are going to use Ollama to run a local LLM 
 
 - **Ollama Installed:** Download it from ollama.com.
 - **Pull the Model:** Open your terminal and run: ollama pull llama3.
+- **Run llama3:** In the terminal run: ollama run llama3
 
 ### Install the necessary libraries
 
