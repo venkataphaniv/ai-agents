@@ -1,0 +1,106 @@
+# Build a Multi-Agent System With LangGraph
+
+The future of AI isn’t about building a smarter chatbot; it’s about building a team. Today, we will build that team using LangGraph. We will create a Multi-Agent System where one AI agent acts as a Researcher (browsing the web), and another acts as a Writer (synthesising that info). They will pass work to each other like colleagues in a newsroom.
+
+## What is LangGraph
+
+We recommend you use LangChain if you want to quickly build agents and autonomous applications. Use LangGraph, a low-level agent orchestration framework and runtime, when you have more advanced needs that require a combination of deterministic and agentic workflows, heavy customization, and carefully controlled latency.
+
+LangChain agents are built on top of LangGraph in order to provide durable execution, streaming, human-in-the-loop, persistence, and more. You do not need to know LangGraph for basic LangChain agent usage.
+
+LangGraph is focused on the underlying capabilities important for agent orchestration: durable execution, streaming, human-in-the-loop, and more.
+
+### Snippet
+
+```python
+    # pip install -qU langchain "langchain[anthropic]"
+
+    from langchain.agents import create_agent
+
+    def get_weather(city: str) -> str:
+        """Get weather for a given city."""
+        return f"It's always sunny in {city}!"
+
+    agent = create_agent(
+        model="claude-sonnet-4-5-20250929",
+        tools=[get_weather],
+        system_prompt="You are a helpful assistant",
+    )
+
+    # Run the agent
+    agent.invoke(
+        {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
+    )
+```
+
+## Core benefits
+
+LangGraph provides low-level supporting infrastructure for any long-running, stateful workflow or agent. LangGraph does not abstract prompts or architecture, and provides the following central benefits:
+
+- Durable execution: Build agents that persist through failures and can run for extended periods, resuming from where they left off.
+
+- Human-in-the-loop: Incorporate human oversight by inspecting and modifying agent state at any point.
+
+- Comprehensive memory: Create stateful agents with both short-term working memory for ongoing reasoning and long-term memory across sessions.
+
+- Debugging with LangSmith: Gain deep visibility into complex agent behavior with visualization tools that trace execution paths, capture state transitions, and provide detailed runtime metrics.
+
+- Production-ready deployment: Deploy sophisticated agent systems confidently with scalable infrastructure designed to handle the unique challenges of stateful, long-running workflows.
+
+## LangGraph ecosystem
+
+While LangGraph can be used standalone, it also integrates seamlessly with any LangChain product, giving developers a full suite of tools for building agents. To improve your LLM application development, pair LangGraph with LangChain and LangSmith
+
+Imagine a relay race. Runner A has the baton (data). They run their lap (task) and then pass the baton to Runner B. Runner B cannot start until they receive the baton.
+
+LangGraph allows us to code this relay race.
+
+- Nodes: These are the agents or functions (The Runners).
+- Edges: These are the rules of who goes next (The Track).
+- State: This is the shared memory (The Baton).
+
+Instead of one giant prompt, we break the logic into small, reliable steps.
+
+## The Setup
+
+To keep this accessible and free, we are going to use Ollama to run a local LLM (Llama 3). This means you don’t need an OpenAI API key to follow along, though you will need a decent internet connection for the search tool.
+
+### Prerequisites
+
+- **Ollama Installed:** Download it from ollama.com.
+- **Pull the Model:** Open your terminal and run: ollama pull llama3.
+
+### Install the necessary libraries
+
+```bash
+
+    pip install langgraph langchain langchain-community langchain-ollama duckduckgo-search ddgs
+
+```
+
+## Getting Started
+
+We will build this in three parts: The State, The Agents, and The Graph.
+
+### Step 1: Defining the Shared State
+
+Think of the AgentState as a shared clipboard that hangs on the office wall. Every agent can read from it and write to it. This ensures that when the Researcher finds something, the Writer can actually see it.
+
+### Step 2: The Researcher Agent
+
+Our first employee is the Researcher. Their job is simple: take a topic, search DuckDuckGo, and paste the results onto the clipboard (State)
+
+Notice we aren’t using an LLM here yet! We are just using a deterministic tool (Search). This saves cost and reduces hallucinations. We are grounding the workflow in real data first.
+
+### Step 3: The Writer Agent
+
+Now, the Writer steps in. This agent uses Llama 3 (via Ollama). It reads the research_data found by the previous agent and drafts the content
+The temperature=0.7 gives the model a bit of creativity. If you wanted a strict report, you might lower this to 0.1.
+
+### Step 4: Wiring the Graph
+
+This is the key part. We define the workflow. It is a linear path:
+
+```flow
+    Start -> Researcher -> Writer -> End
+```
