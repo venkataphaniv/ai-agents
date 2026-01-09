@@ -104,3 +104,50 @@ This is the key part. We define the workflow. It is a linear path:
 ```flow
     Start -> Researcher -> Writer -> End
 ```
+
+### Step 5: Run
+
+We run the python script, to see the below typical output:
+
+```bash
+$ python ai-agents\multi-agent-system\multi_agent_system.py
+
+Starting the Multi-Agent System...
+
+---------------- INITIAL INPUTS ----------------
+
+Topic: The future of AI Agents
+
+Researcher is looking up: The future of AI Agents...
+Research complete.
+Writer is drafting the post...
+Writing complete.
+
+---------------- FINAL OUTPUT ----------------
+
+**The Future of AI Agents: 5 Trends Redefining Business Value**
+
+As we step into the new decade, the AI revolution is reaching a critical juncture. The latest trends report from Google Cloud, accompanied by the NotebookLM companion, highlights five key shifts that will reshape the landscape of AI agents and drive unprecedented value in the coming year.
+
+**1. Agent-Powered Automation**
+
+Big AI is moving away from static models and toward building agents that can take actions on our behalf. These assistants promise to simplify complex tasks, freeing us up to focus on high-value activities. With the rise of protocol-driven integrations, we'll see a surge in agent-enabled automation across industries.
+
+**2. Cooperative Model Routing**
+
+In 2026, expect to see smaller models delegating tasks to larger ones, creating a network effect that amplifies their collective capabilities. Whoever masters this system-level integration will dominate the market. Gabe Godhart's words echo our sentiment: "Whoever nails that system-level integration will shape the market."
+
+**3. AI Energy Consumption**
+
+As AI agents become more pervasive, energy consumption will become a pressing concern. Expect innovations in AI-powered data centers and cloud infrastructure to address this challenge head-on.
+
+**4. Anthropic's Computer Use**
+
+Anthropic's computer use has opened doors for AI-generated text, but what does the future hold? Will we see increased adoption of AI-generated content, or will concerns around authenticity and credibility lead to a more nuanced approach?
+
+**5. Google Watermarking AI-Generated Text**
+
+Google's watermarking initiative marks a significant shift toward authenticity in AI-generated content. This move could have far-reaching implications for industries that rely on high-quality text generation.
+
+As we look ahead to 2026, it's clear that AI agents will fundamentally reshape business and drive new value. Stay tuned for more insights on these trends as they continue to evolve and transform the landscape of AI.
+```
