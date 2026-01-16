@@ -16,10 +16,10 @@ from pathlib import Path
 from crewai import Agent, Task, Crew, Process
 from crewai.tools import BaseTool
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, OpenAI
-from langchain.chains import RetrievalQA
+from langchain_classic.chains.retrieval_qa import RetrievalQA
 
 
 # Configure logging
@@ -367,22 +367,23 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="CrewAI PDF Processing Pipeline")
-    parser.add_argument("--pdf", required=True, help="Path to PDF file")
-    parser.add_argument("--api-key", help="OpenAI API key (or set OPENAI_API_KEY env var)")
-    parser.add_argument("--vector-store", default="./vector_store", help="Path to save vector store")
-    parser.add_argument("--chunk-size", type=int, default=800, help="Text chunk size (default: 800)")
-    parser.add_argument("--chunk-overlap", type=int, default=100, help="Text chunk overlap (default: 100)")
+    parser.add_argument("--p", "--pdf", required=True, help="Path to PDF file")
+    parser.add_argument('-k', "--api-key", nargs='?', help="OpenAI API key (or set OPENAI_API_KEY env var)")
+    parser.add_argument('-v', "--vector-store", default="./vector_store", help="Path to save vector store")
+    parser.add_argument('-cs',"--chunk-size", type=int, default=800, help="Text chunk size (default: 800)")
+    parser.add_argument('-co',"--chunk-overlap", type=int, default=100, help="Text chunk overlap (default: 100)")
 
     args = parser.parse_args()
 
     # Get API key
     api_key = args.api_key or os.getenv("OPENAI_API_KEY")
+
     if not api_key:
         print("Error: OpenAI API key required (--api-key or OPENAI_API_KEY env var)")
         return 1
 
     # Configure pipeline
-    config = PipelineConfig(
+    cfg = PipelineConfig(
         pdf_path=args.pdf,
         openai_api_key=api_key,
         chunk_size=args.chunk_size,
@@ -393,8 +394,8 @@ def main():
     )
 
     # Initialize and run pipeline
-    pipeline = CrewAIPDFPipeline(config)
-    results = pipeline.execute_pipeline()
+    cp = CrewAIPDFPipeline(cfg)
+    results = cp.execute_pipeline()
 
     # Display results
     if results["status"] == "success":

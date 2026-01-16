@@ -15,14 +15,22 @@ from llama_index.core import (
     Settings,
     Document
 )
+
 from llama_index.core.agent import ReActAgent
 from llama_index.core.tools import FunctionTool, QueryEngineTool, ToolMetadata
+
 from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
+
+from llama_index.llms.ollama import Ollama
+from llama_index.embeddings.ollama import OllamaEmbedding
+
 from llama_index.core.node_parser import SimpleNodeParser
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.composability import QASummaryQueryEngineBuilder
-import json
+import json as j
+import asyncio as aio
+
 
 load_dotenv()
 
@@ -36,15 +44,24 @@ class AgenticRAGSystem:
     - Memory for context retention
     """
 
-    def __init__(self):
+    def __init__(self, llm: str='ollama', model: str = 'llama3'):
+        self.llm = llm
+        # Model name for Ollama, or OpenAI, e.g., llama3, mxbai-embed-large
+        self.model = model
         self.setup_llm()
         self.indices = {}
         self.agent = None
 
     def setup_llm(self):
         """Configure LLM and embedding models"""
-        Settings.llm = OpenAI(model="gpt-4", temperature=0.7)
-        Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+        if self.llm == 'ollama':
+            Settings.llm = Ollama(model=self.model, temperature=0.7)
+            Settings.embed_model = OllamaEmbedding(model_name=self.model)
+        elif self.llm == 'openai':
+            Settings.llm = OpenAI(model="gpt-4", temperature=0.7)
+            Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+        # elif self.llm == 'hf': # HuggingFace
+
 
     def create_sample_documents(self) -> List[Document]:
         """Create fun sample documents about AI and programming"""
@@ -246,6 +263,7 @@ class AgenticRAGSystem:
 
         # Create query engine tool for RAG
         query_engine = knowledge_index.as_query_engine(similarity_top_k=3)
+
         rag_tool = QueryEngineTool(
             query_engine=query_engine,
             metadata=ToolMetadata(
@@ -263,7 +281,7 @@ class AgenticRAGSystem:
         memory = ChatMemoryBuffer.from_defaults(token_limit=3000)
 
         # Create the agent
-        self.agent = ReActAgent.from_tools(
+        self.agent = ReActAgent(
             tools=[rag_tool, calculator_tool, joke_tool, summary_tool],
             llm=Settings.llm,
             memory=memory,
@@ -274,15 +292,16 @@ class AgenticRAGSystem:
         print("✅ Agent ready! It can search knowledge, calculate, tell jokes, and summarize!")
         return self.agent
 
-    def chat(self, message: str):
+    def chat(self, msg: str):
         """Chat with the agent"""
         if not self.agent:
             self.create_agent()
 
-        response = self.agent.chat(message)
-        return response
+        l = aio.get_event_loop()
+        res = l.run_until_complete(self.agent.run(user_msg=msg))
+        return res
 
-    def save_conversation(self, filename: str = "conversation_history.json"):
+    def save_conversation(self, fn: str = "conversation_history.json"):
         """Save the conversation history"""
         if not self.agent:
             return
@@ -294,9 +313,9 @@ class AgenticRAGSystem:
                 "content": msg.content
             })
 
-        with open(filename, 'w') as f:
-            json.dump(history, f, indent=2)
-        print(f"💾 Conversation saved to {filename}")
+        with open(fn, 'w') as f:
+            j.dump(history, f, indent=2)
+        print(f"💾 Conversation saved to {fn}")
 
 
 def main():
@@ -304,8 +323,13 @@ def main():
     print("🌟 Welcome to the LlamaIndex Agentic RAG Demo! 🌟")
     print("=" * 50)
 
+    llm: str = input("Choose LLM (OpenAI / Ollama) [default: Ollama]: ").strip().lower()
+    if not llm:
+        llm = "ollama"
+    print(f"Using LLM: {llm.capitalize()}\n")
+
     # Initialize the system
-    rag_system = AgenticRAGSystem()
+    rag_system = AgenticRAGSystem(llm)
     rag_system.create_agent()
 
     print("\n📝 Example queries you can try:")
@@ -318,17 +342,17 @@ def main():
     print("\nType 'exit' to quit, 'save' to save conversation\n")
 
     while True:
-        user_input = input("\n🤔 You: ")
+        ip = input("\n🤔 You: ")
 
-        if user_input.lower() == 'exit':
+        if ip.lower() == 'exit':
             print("👋 Thanks for chatting! Goodbye!")
             break
-        elif user_input.lower() == 'save':
+        elif ip.lower() == 'save':
             rag_system.save_conversation()
             continue
 
         print("\n🤖 Agent thinking...\n")
-        response = rag_system.chat(user_input)
+        response = rag_system.chat(ip)
         print(f"\n💬 Agent: {response}")
 
 

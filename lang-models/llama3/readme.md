@@ -1,6 +1,6 @@
 # Run a Powerful LLM Locally
 
-We can run powerful, multi-billion-parameter large language models like Llama 3.1 and Mistral on your own laptop. Onr of such an LLM is Ollama
+We can run powerful, multi-billion-parameter large language models like Llama 3.1 and Mistral on your own laptop. One of such an LLM is Ollama
 
 ## What is Ollama
 

@@ -4,7 +4,10 @@ llama-index-embeddings-openai
 llama-index-vector-stores-faiss
 llama-index-agent-openai
 llama-index-tools-wikipedia
-llama-index-tools-web
+llama-index-llms-ollama
+llama-index-embeddings-ollama
+llama-index-llms-huggingface
+llama-index-embeddings-huggingface
 faiss-cpu
 python-dotenv
 streamlit

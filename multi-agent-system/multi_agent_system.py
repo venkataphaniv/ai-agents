@@ -66,6 +66,7 @@ Return just the blog post content."""
 if __name__ == "__main__":
     # ----- Build the LangGraph -----
     print("Starting the Multi-Agent System...\n")
+    print("Building LangGraph...\n")
 
     print("---------------- INITIAL INPUTS ----------------\n")
     print("Topic: The future of AI Agents\n")
