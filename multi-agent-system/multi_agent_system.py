@@ -44,23 +44,23 @@ def writer_node(state: AgentState):
     topic = state["topic"]
     data = state["research_data"][-1] if state["research_data"] else ""
 
-    llm = ChatOllama(model="llama3", temperature=0.7)
+    llm = ChatOllama(model="llama3.3", temperature=0.8)
 
     prompt = ChatPromptTemplate.from_template(
-        """You are a tech blog writer.
-Write a short, engaging blog post about "{topic}"
-based ONLY on the following research data:
+        """You are a technical blog writer, a deep researcher, and tech enthusiast.
+        Your task is to write an engaging blog post OF 10000 words about the following "{topic}",
+        based ONLY on the following research data:
 
-{data}
+        {data}
 
-Return just the blog post content."""
+        Return the blog post content."""
     )
 
     chain = prompt | llm
-    response = chain.invoke({"topic": topic, "data": data})
+    res = chain.invoke({"topic": topic, "data": data})
 
     print("Writing complete.")
-    return {"blog_post": response.content}
+    return {"blog_post": res.content}
 
 
 if __name__ == "__main__":
@@ -69,10 +69,12 @@ if __name__ == "__main__":
     print("Building LangGraph...\n")
 
     print("---------------- INITIAL INPUTS ----------------\n")
-    print("Topic: The future of AI Agents\n")
+    # topic = "The future of AI Agents, autonomous agents, and their impact on society. The latest advancements, ethical considerations, and potential use cases."
+    topic = "How to develop a robot, from a developers perspective. Programming language considerations, hardware choices, and the future of robotics. Also, good examples of robots in the world and how they work. Full working code examples (repositories) which will help the developers"
+    print(f"Topic: {topic}\n")
 
     inputs: AgentState = {
-        "topic": "The future of AI Agents",
+        "topic": topic,
         "research_data": [],
         "blog_post": "",
     }
